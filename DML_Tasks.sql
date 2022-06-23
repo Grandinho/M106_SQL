@@ -54,8 +54,8 @@ FROM DeliveryMethodsNew;
 
 select * from DeliveryMethodsUpdate
 insert into DeliveryMethodsUpdate (DeliveryMethodID, DeliveryMethodName, LastEditedBy, ValidFrom, ValidTo) values 
-(11, 'Velokurier', 1,  '9999-12-31', '23:59:59.9999999'),
-(12, 'Beaming', 1,  '9999-12-31', '23:59:59.9999999');
+(11, 'Velokurier', 1,  GETDATE(), '23:59:59.9999999'),
+(12, 'Beaming', 1,  GETDATE(), '23:59:59.9999999');
 
 
 Update DeliveryMethodsUpdate set DeliveryMethodName = 'DHL', ValidFrom = GETDATE() where DeliveryMethodID = 1;
