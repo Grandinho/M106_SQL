@@ -75,3 +75,6 @@ then delete;
 
 select * from DeliveryMethodsUpdate
 select * from DeliveryMethodsNew
+
+select   LastEditedBy ,count(LastEditedBy) from DeliveryMethodsNew
+group by LastEditedBy

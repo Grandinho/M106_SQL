@@ -1,3 +1,5 @@
+use WideWorldImporters
+
 -- Select
 Select * from Sales.Customers
 Select Sales.Customers.CustomerName, sales.Customers.DeliveryAddressLine1 from sales.Customers
@@ -132,3 +134,155 @@ Select CustomerID from sales.orders
 
 -- 3.3
 
+select 
+c1.CustomerName,  
+c2.DeliveryAddressLine1+' '+c2.DeliveryAddressLine2+' '+c2.DeliveryPostalCode+' '
++ c2.PostalAddressLine1 +' '+ c2.PostalAddressLine2 AS ADRESSE from sales.Customers c1
+join sales.Customers c2 on c1.CustomerID = c2.CustomerID
+
+
+
+
+
+
+
+select * from sales.Customers
+
+
+SELECT  CustomerID ,CustomerName, DeliveryAddressLine1+' '+DeliveryAddressLine2+' '+DeliveryPostalCode+' '
++PostalAddressLine1+' '+PostalAddressLine2 AS ADRESSE FROM Sales.customers
+WHERE CustomerID IN (SELECT Distinct BillToCustomerID FROM Sales.customers)
+
+
+
+select *, c2.* from sales.Customers c1
+join sales.Customers c2 on c1.BillToCustomerID = c2.BillToCustomerID
+
+select  C1.CustomerID,  C1.CustomerName, DeliveryAddressLine1 from sales.Customers C1
+
+select * from sales.Customers 
+where CustomerID != BillToCustomerID
+
+SELECT DISTINCT BillToCustomerID FROM Sales.customers
+
+
+-- 4. Cases
+
+-- 4.1
+select * from Application.People
+Select p.FullName, p.PhoneNumber, p.FaxNumber,
+(case
+when p.IsSalesperson = 1 then 'Verkäufer'
+when p.IsEmployee = 1 then 'Mitarbeiter'
+when p.IsEmployee = 0 and p.IsSalesperson = 0 then 'Kunde'
+end) as 'Rolle'
+from Application.People p
+where p.PhoneNumber is not Null or p.FaxNumber is not null
+
+
+-- 5. Gruppierungen
+
+-- 5.1
+
+select * from sales.OrderLines
+
+
+select top 10 OrderID, sum(Quantity*UnitPrice) as 'Amount' from sales.OrderLines 
+group by OrderID
+order by Amount desc
+
+-- 5.2
+
+select top 10 ol.OrderID, sum(Quantity*UnitPrice) as 'Amount', c.CustomerName from sales.OrderLines as ol
+join sales.Orders as o on ol.OrderID = o.OrderID
+join sales.Customers as c on o.CustomerID = c.CustomerID
+group by ol.OrderID, c.CustomerName
+order by Amount desc
+
+select * from sales.orders
+
+select top 10 ol.OrderID, c.CustomerID, c.CustomerName , sum(Quantity*UnitPrice) as 'Amount' from sales.OrderLines ol
+join sales.Orders o on o.OrderID = ol.OrderID
+join sales.Customers c on o.CustomerID = c.CustomerID
+group by ol.OrderID, c.CustomerID, c.CustomerName
+order by Amount desc
+
+	
+
+select * from sales.Orders
+where OrderID = 30269
+
+
+select * from sales.Orders
+where OrderID = 17103
+
+select * from sales.Customers
+where CustomerID = 834
+
+select * from sales.Customers
+where CustomerID = 86
+
+-- Teacher's solution
+SELECT c.CustomerName FROM Sales.Customers c
+Join Sales.Orders o ON c.CustomerID=o.CustomerID 
+JOIN 
+(SELECT TOP (10) ol.OrderID, SUM(ol.Quantity*ol.UnitPrice) AS 'TOTAL' FROM Sales.OrderLines ol
+GROUP BY ol.OrderID
+ORDER BY TOTAL DESC) u ON o.OrderID = u.OrderID 
+
+select * from sales.Customers
+where CustomerName = 'Tailspin Toys (Medicine Lodge, KS)'
+
+select * from sales.Orders
+where CustomerID = 4
+
+
+-- 5.3 
+select top 10 c.CustomerName , sum(Quantity*UnitPrice) as 'Amount' from sales.Customers c
+join sales.Orders o on c.CustomerID = o.CustomerID
+join sales.OrderLines ol on o.OrderID = ol.OrderID
+group by  c.CustomerName
+order by Amount desc
+
+-- 5.4
+select c.CountryName, COUNT(*) as 'Provinzanzahl' from Application.StateProvinces as st
+join Application.Countries as c on st.CountryID = c.CountryID
+group by c.CountryName
+
+
+-- 5.6
+
+select OrderID, count(*) as 'Artikel anzahl' from sales.OrderLines
+group by OrderID
+having count(*) >= 5
+
+
+-- 6. Union
+
+-- 6.1
+
+select CustomerCategoryID, CustomerCategoryName from sales.CustomerCategories
+where CustomerCategoryID in (select distinct CustomerCategoryID from sales.Customers)
+
+select distinct s1.CustomerCategoryID, CustomerCategoryName from sales.CustomerCategories s1
+join sales.Customers on s1.CustomerCategoryID = sales.Customers.CustomerCategoryID
+
+SELECT CustomerCategoryID,CustomerCategoryName FROM Sales.CustomerCategories
+WHERE CustomerCategoryID IN(SELECT DISTINCT CustomerCategoryID FROM Sales.Customers)
+
+
+-- Views
+
+Create view CaliforniaCities as
+select CityID, CityName, st.StateProvinceCode, st.StateProvinceName from Application.Cities as c
+join Application.StateProvinces as st on c.StateProvinceID = st.StateProvinceID
+where st.StateProvinceName = 'California'
+
+select CityID, CityName, st.StateProvinceCode, st.StateProvinceName from Application.Cities as c
+join (select StateProvinceID, StateProvinceCode, StateProvinceName from Application.StateProvinces
+where StateProvinceName = 'California'
+) st on st.StateProvinceID = c.StateProvinceID
+
+select * from CaliforniaCities where CityName = 'Los Angeles'
+
+Drop view CaliforniaCities
